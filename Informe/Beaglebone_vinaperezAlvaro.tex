@@ -94,6 +94,54 @@ procesamiento y visualización de información en sistemas embebidos. Esta arqui
 proporciona una base sólida para comprender los fundamentos de la comunicación IoT y el 
 desarrollo de aplicaciones web en plataformas embebidas.
 
+\subsection{Sincronización de código con Visual Studio Code}
+
+Para facilitar el desarrollo y la transferencia de archivos entre el ordenador de desarrollo 
+y la BeagleBone Black, se utilizó la extensión SFTP de Visual Studio Code. Esta herramienta 
+permite sincronizar automáticamente los archivos del proyecto mediante el protocolo SFTP 
+(SSH File Transfer Protocol).
+
+La configuración se realiza mediante un archivo JSON (\texttt{sftp.json}) ubicado en la 
+carpeta \texttt{.vscode} del proyecto:
+
+\begin{lstlisting}[language=C++]
+{
+    "name": "BeagleBone",
+    "host": "192.168.7.2",
+    "protocol": "sftp",
+    "port": 22,
+    "username": "debian",
+    "password": "temppwd",
+    "remotePath": "/home/debian/Proyectos",
+    "localPath": "./",
+    "uploadOnSave": true,
+    "syncMode": "update",
+    "watcher": {
+        "files": "**/*",
+        "autoUpload": true,
+        "autoDelete": true
+    }
+}
+\end{lstlisting}
+
+Los parámetros más relevantes de esta configuración son:
+
+\begin{itemize}
+    \item \textbf{host}: Dirección IP de la BeagleBone (192.168.7.2 corresponde a la 
+    conexión USB directa).
+    \item \textbf{uploadOnSave}: Activa la carga automática de archivos cada vez que 
+    se guardan cambios en Visual Studio Code.
+    \item \textbf{syncMode}: Modo de sincronización que solo actualiza archivos 
+    modificados.
+    \item \textbf{watcher}: Observador que detecta automáticamente cambios en los 
+    archivos del proyecto y los sincroniza en tiempo real.
+\end{itemize}
+
+Esta configuración agiliza significativamente el proceso de desarrollo, permitiendo 
+editar el código en el entorno familiar de Visual Studio Code y visualizar los cambios 
+inmediatamente en la BeagleBone sin necesidad de transferencias manuales mediante SCP 
+o FTP.
+
 
 \subsection{Configuración de la BeagleBone como Broker MQTT}
 
@@ -811,5 +859,58 @@ exclusivamente de servir la interfaz web con los datos más recientes disponible
 
 \section{Conclusiones}
 
+Este proyecto ha permitido implementar con éxito un sistema completo de monitorización 
+basado en el protocolo MQTT, integrando una BeagleBone Black que actúa simultáneamente 
+como broker y cliente MQTT, junto con una interfaz web desarrollada en Flask para la 
+visualización de datos en tiempo real.
+
+Los principales logros alcanzados incluyen:
+
+\begin{itemize}
+    \item \textbf{Configuración exitosa del broker Mosquitto:} Se ha establecido un 
+    broker MQTT funcional en la BeagleBone Black, capaz de gestionar múltiples clientes 
+    y tópicos de forma eficiente.
+    
+    \item \textbf{Desarrollo de una interfaz web intuitiva:} La implementación en Flask 
+    proporciona una visualización clara y accesible de los datos provenientes de cuatro 
+    tópicos diferentes (temperatura, humedad y dos sensores de puerta), con actualización 
+    automática cada 2 segundos.
+    
+    \item \textbf{Validación exhaustiva del sistema:} Las pruebas realizadas con 
+    comunicación local, MQTT Explorer y la interfaz web han confirmado el correcto 
+    funcionamiento de todos los componentes de la arquitectura.
+    
+    \item \textbf{Arquitectura modular y escalable:} El diseño implementado permite 
+    añadir fácilmente nuevos sensores o tópicos MQTT simplemente extendiendo las 
+    variables globales y la plantilla HTML.
+\end{itemize}
+
+Durante el desarrollo del proyecto se han adquirido competencias fundamentales en:
+
+\begin{itemize}
+    \item Configuración y administración de sistemas embebidos basados en Linux (Debian).
+    \item Implementación de comunicaciones IoT mediante el protocolo MQTT.
+    \item Desarrollo de aplicaciones web en Python utilizando el framework Flask.
+    \item Programación concurrente mediante threading para gestión de múltiples procesos.
+    \item Integración de diferentes tecnologías (MQTT, Flask, HTML/CSS/JavaScript) en 
+    una solución completa.
+\end{itemize}
+
+Este trabajo constituye una base sólida para el desarrollo del proyecto final de la 
+asignatura, habiendo establecido una infraestructura robusta de comunicación y 
+visualización que podrá ser extendida con funcionalidades adicionales como:
+
+\begin{itemize}
+    \item Almacenamiento persistente de datos históricos en bases de datos.
+    \item Implementación de actuadores controlables remotamente vía MQTT.
+    \item Mejora de la interfaz web mediante WebSockets para eliminación de recargas.
+    \item Incorporación de sistemas de autenticación y seguridad en las comunicaciones.
+    \item Análisis y visualización avanzada de datos mediante gráficas temporales.
+\end{itemize}
+
+En conclusión, el proyecto ha cumplido satisfactoriamente con los objetivos planteados, 
+demostrando la viabilidad de implementar sistemas IoT completos en plataformas embebidas 
+como la BeagleBone Black, y proporcionando una experiencia práctica valiosa en el diseño 
+e implementación de arquitecturas publish-subscribe para sistemas embebidos.
 
 \end{document}
