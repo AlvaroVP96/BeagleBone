@@ -7,25 +7,34 @@ app = Flask(__name__)
 # Variable global para almacenar el último mensaje recibido
 ultimo_mensaje_temp = "Esperando actualización..."
 ultimo_mensaje_hum = "Esperando actualización..."
+ultimo_mensaje_door1 = "Esperando actualización..."
+ultimo_mensaje_door2 = "Esperando actualización..."
 
 # Configuración MQTT
 MQTT_BROKER = "localhost"
 MQTT_PORT = 1883
 MQTT_TOPIC_TEMP = "Sensores/temperatura"
 MQTT_TOPIC_HUM = "Sensores/humedad"
+MQTT_TOPIC_DOOR_1 = "Sensores/Puertas/Puerta1"
+MQTT_TOPIC_DOOR_2 = "Sensores/Puertas/Puerta2"
 
 # Callback cuando se conecta al broker MQTT
 def on_connect(client, userdata, flags, rc, properties=None):
     print(f"Conectado al broker MQTT con código: {rc}")
     client.subscribe(MQTT_TOPIC_TEMP)
     client.subscribe(MQTT_TOPIC_HUM)
+    client.subscribe(MQTT_TOPIC_DOOR_1)
+    client.subscribe(MQTT_TOPIC_DOOR_2)
     print(f"Suscrito al topic: {MQTT_TOPIC_TEMP}")
     print(f"Suscrito al topic: {MQTT_TOPIC_HUM}")
+    print(f"Suscrito al topic: {MQTT_TOPIC_DOOR_1}")
+    print(f"Suscrito al topic: {MQTT_TOPIC_DOOR_2}")
+
 
 
 # Callback cuando se recibe un mensaje
 def on_message(client, userdata, msg):
-    global ultimo_mensaje_temp, ultimo_mensaje_hum
+    global ultimo_mensaje_temp, ultimo_mensaje_hum,ultimo_mensaje_door2,ultimo_mensaje_door1
     
     # Verificar de qué topic viene el mensaje
     if msg.topic == MQTT_TOPIC_TEMP:
@@ -34,7 +43,12 @@ def on_message(client, userdata, msg):
     elif msg.topic == MQTT_TOPIC_HUM:
         ultimo_mensaje_hum = msg.payload.decode()
         print(f"Mensaje humedad recibido: {ultimo_mensaje_hum}")
-
+    elif msg.topic == MQTT_TOPIC_DOOR_1:
+        ultimo_mensaje_door1 = msg.payload.decode()
+        print(f"Mensaje humedad recibido: {ultimo_mensaje_door1}")
+    elif msg.topic == MQTT_TOPIC_DOOR_2:
+        ultimo_mensaje_door2 = msg.payload.decode()
+        print(f"Mensaje humedad recibido: {ultimo_mensaje_door2}")
 
 # Inicializar cliente MQTT
 mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
@@ -180,13 +194,13 @@ HTML_TEMPLATE = """
 <body>
     <div class="container">
         <header>
-            <h1>🌐 Monitor MQTT</h1>
-            <span class="status">● Conectado</span>
+            <h1>Monitor MQTT</h1>
+            <span class="status">Conectado</span>
         </header>
         
         <div class="dashboard">
             <div class="card">
-                <h2>🌡️ Sensor Temperatura</h2>
+                <h2>Sensor Temperatura</h2>
                 <div class="message-box">
                     {{ mensaje_temp }}
                 </div>
@@ -199,12 +213,38 @@ HTML_TEMPLATE = """
             </div>
 
             <div class="card">
-                <h2>💧 Sensor Humedad</h2>
+                <h2>Sensor Humedad</h2>
                 <div class="message-box">
                     {{ mensaje_hum }}
                 </div>
                 <div class="info">
                     <strong>Topic:</strong> <span class="topic-badge">{{ topic_hum }}</span>
+                </div>
+                <div class="timestamp">
+                    Actualizado automáticamente cada 2 segundos
+                </div>
+            </div>
+            
+             <div class="card">
+                <h2>Puerta Exterior</h2>
+                <div class="message-box">
+                    {{ mensaje_door1 }}
+                </div>
+                <div class="info">
+                    <strong>Topic:</strong> <span class="topic-badge">{{ topic_door1 }}</span>
+                </div>
+                <div class="timestamp">
+                    Actualizado automáticamente cada 2 segundos
+                </div>
+            </div>
+
+             <div class="card">
+                <h2>Puerta Interior</h2>
+                <div class="message-box">
+                    {{ mensaje_door2 }}
+                </div>
+                <div class="info">
+                    <strong>Topic:</strong> <span class="topic-badge">{{ topic_door2 }}</span>
                 </div>
                 <div class="timestamp">
                     Actualizado automáticamente cada 2 segundos
@@ -224,8 +264,12 @@ def index():
         HTML_TEMPLATE,
         mensaje_hum=ultimo_mensaje_hum,
         mensaje_temp=ultimo_mensaje_temp,
+        mensaje_door1=ultimo_mensaje_door1,
+        mensaje_door2=ultimo_mensaje_door2,
         topic_temp=MQTT_TOPIC_TEMP,
-        topic_hum=MQTT_TOPIC_HUM
+        topic_hum=MQTT_TOPIC_HUM,
+        topic_door1=MQTT_TOPIC_DOOR_1,
+        topic_door2=MQTT_TOPIC_DOOR_2
     )
 
 if __name__ == "__main__":
